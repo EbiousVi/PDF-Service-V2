@@ -1,6 +1,8 @@
 package com.example.pdf.service.h2db;
 
+import com.example.pdf.domain.entity.Filename;
 import com.example.pdf.domain.entity.Namespace;
+import com.example.pdf.exception.CustomDBException;
 import com.example.pdf.repository.NamespaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,24 +19,33 @@ public class NamespaceService {
         this.namespaceRepository = namespaceRepository;
     }
 
-    public Namespace getNamespaceByName(String name) {
-        return namespaceRepository.findByNamespace(name);
+    public Namespace getNamespaceByName(String name) throws CustomDBException {
+        return namespaceRepository.findByName(name)
+                .orElseThrow(() -> new CustomDBException("Namespace = " + name + " not found!"));
     }
 
-    public List<String> getAllNamespace() {
-        return namespaceRepository.findAll()
+    public List<Namespace> getAllNamespace() {
+        return namespaceRepository.findAll();
+    }
+
+    public List<String> getFilenamesByNamespace(String name) throws CustomDBException {
+        Namespace namespace = this.getNamespaceByName(name);
+        return namespace.getFilenames()
                 .stream()
-                .map(Namespace::getNamespace)
+                .map(Filename::getName)
                 .collect(Collectors.toList());
     }
 
-    public void addNamespace(String name) {
-        Namespace namespace = new Namespace();
-        namespace.setNamespace(name);
-        namespaceRepository.save(namespace);
+    public void addNamespace(String name) throws CustomDBException {
+        Namespace namespace = new Namespace(name);
+        if (!namespaceRepository.existsByName(name)) {
+            namespaceRepository.save(namespace);
+        } else {
+            throw new CustomDBException("Namespace = " + name + " already exist!");
+        }
     }
 
-    public void deleteNamespaceByName(String name) {
+    public void deleteNamespaceByName(String name) throws CustomDBException {
         Namespace namespace = this.getNamespaceByName(name);
         namespaceRepository.delete(namespace);
     }

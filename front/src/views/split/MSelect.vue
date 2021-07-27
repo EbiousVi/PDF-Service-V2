@@ -1,4 +1,5 @@
 <template>
+    <modal v-if="warn" :message="warnInfo" @close="closeWarn"></modal>
     <div class="m-sel-container" :tabindex="0" @blur="blur" @focus="focus = true"
          :class="{'m-sel-m-sel-disabled' : true}">
         <div class="m-sel-value-container"
@@ -43,9 +44,11 @@
 
 <script>
     import axios from "axios";
+    import Modal from "../../components/Modal";
 
     export default {
         name: "m-select",
+        components: {Modal},
         emits: ["selected", "deleted"],
         props: {
             options: {
@@ -60,9 +63,15 @@
                 type: Boolean,
                 default: false,
             },
+            selectedNamespace: {
+                type: String
+            },
             isFilename: {
                 type: Boolean,
                 default: false
+            },
+            selectedFilename: {
+                type: String
             },
         },
         watch: {
@@ -85,10 +94,14 @@
                 focus: false,
                 showOptions: false,
                 selectedOption: "Select option",
-                status: "",
+                warn: false,
+                warnInfo: "",
             };
         },
         methods: {
+            closeWarn() {
+                this.warn = false;
+            },
             confirmDelete(option) {
                 if (option.canDelete) {
                     option.canDelete = !option.canDelete;
@@ -102,12 +115,10 @@
             },
             deleteOption(option) {
                 if (this.isNamespace) {
-                    console.log("namespace will delete")
-                    let URL = "http://192.168.3.2:6060/delete-namespace/".concat(option.value);
+                    let URL = "http://192.168.3.2:6060/naming/delete-namespace/".concat(option.value);
                     this.delete(URL, option);
                 } else {
-                    console.log("filename will delete")
-                    let URL = "http://192.168.3.2:6060/delete-filename/".concat(option.value);
+                    let URL = "http://192.168.3.2:6060/naming/delete-filename/".concat(this.selectedNamespace).concat("/").concat(option.value);
                     this.delete(URL, option);
                 }
             },
@@ -119,17 +130,22 @@
                 }).then((response) => {
                     if (response.status === 200) {
                         this.selectedOption = "Select option";
-                        this.status = "Success delete " + option.value;
                         this.$emit("deleted", option);
                     }
                 }).catch(error => {
-                    this.status = error.response.data.error + " " + error.response.status;
+                    if (!error.response) {
+                        this.warn = true;
+                        this.warnInfo = error.message;
+                    } else {
+                        this.warn = true;
+                        this.warnInfo = error.response.data;
+                    }
+                    this.showOptions = false;
                 });
             },
             selectOption(option) {
                 this.showOptions = false;
                 this.selectedOption = option.value;
-                this.status = "";
                 this.$emit("selected", this.selectedOption);
             },
             openCloseOptions() {
@@ -189,7 +205,7 @@
         padding: 0;
         border: .1em solid #aaa;
         border-radius: .1em;
-        z-index: 999999;
+        z-index: 999990;
     }
 
     .m-sel-option {
@@ -202,6 +218,8 @@
     }
 
     .m-sel-option-value {
+        padding-top: 1em;
+        padding-bottom: 1em;
         width: 100%;
         text-align: left;
     }

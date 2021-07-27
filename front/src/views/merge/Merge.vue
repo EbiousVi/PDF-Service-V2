@@ -2,7 +2,9 @@
     <div class="merge-container">
         <button class="btn" style="margin-bottom: 10px" @click="$router.push('/')">Main</button>
         <file-input @files="uploadFile" @reset="reset" :multiple="true"></file-input>
+        <waiting v-if="waiting"></waiting>
         <button v-if="isImgLoaded" class="btn" type="button" @click="merge">MERGE</button>
+        <modal v-if="alert" :message="alertInfo" @close="closeAlert"></modal>
         <cards v-if="isImgLoaded" :images="images" @order="getOrder"></cards>
     </div>
 </template>
@@ -11,14 +13,17 @@
     import FileInput from "../../components/FileInput";
     import axios from "axios";
     import Cards from "../../components/Cards";
+    import Waiting from "../../components/Waiting";
+    import Modal from "../../components/Modal";
 
     export default {
         name: "Merge",
-        components: {Cards, FileInput},
+        components: {Modal, Waiting, Cards, FileInput},
         data() {
             return {
                 alert: false,
                 alertInfo: "",
+                waiting: false,
                 images: [],
                 isImgLoaded: false,
                 order: [],
@@ -51,14 +56,23 @@
                         URL.revokeObjectURL(blobUrl);
                         this.order = [];
                     }
+                }).catch(error => {
+                    if (!error.response) {
+                        this.alert = true;
+                        this.alertInfo = error.message;
+                    } else {
+                        this.alert = true;
+                        this.alertInfo = error.response.data;
+                    }
                 });
+
             },
             uploadFile(files) {
                 let formData = new FormData();
                 for (let i = 0; i < files.length; i++) {
                     formData.append('file', files[i]);
                 }
-                axios.post('http://192.168.3.2:6060/merge-service/upload', formData,
+                let promise = axios.post('http://192.168.3.2:6060/merge-service/upload', formData,
                     {
                         headers: {
                             'Content-Type': 'multipart/addForm-data'
@@ -77,8 +91,22 @@
                         }
                         this.images = arr;
                         this.isImgLoaded = true;
+                        this.waiting = false;
                     }
+                }).catch(error => {
+                    if (!error.response) {
+                        this.alert = true;
+                        this.alertInfo = error.message;
+                    } else {
+                        this.alert = true;
+                        this.alertInfo = error.response.data;
+                    }
+                    this.waiting = false;
                 });
+                promise.then(this.waiting = true);
+            },
+            closeAlert() {
+                this.alert = !this.alert;
             },
         }
     }

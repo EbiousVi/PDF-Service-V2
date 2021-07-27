@@ -35,7 +35,7 @@
     export default {
         name: "Cards",
         components: {Prompt},
-        emits: ["order"],
+        emits: ["order", "close"],
         data() {
             return {
                 isDeleteEnable: false,

@@ -10,11 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -28,17 +31,18 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public void deleteAll() {
-        FileSystemUtils.deleteRecursively(pathManager.getStorage().toFile());
-    }
-
-    @Override
-    public void init() throws StorageException {
+    public void initStorage() throws StorageException {
         try {
             Files.createDirectories(pathManager.getStorage());
         } catch (IOException e) {
+            e.printStackTrace();
             throw new StorageException("Can't create storage!");
         }
+    }
+
+    @Override
+    public void deleteStorage() {
+        FileSystemUtils.deleteRecursively(pathManager.getStorage().toFile());
     }
 
     @Override
@@ -74,37 +78,79 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Path saveUploadedFile(MultipartFile file, ServiceType serviceType) throws StorageException {
-        if (file.isEmpty()) throw new StorageException("File not present");
-        DirUtils.createStorageToUploadedFiles(serviceType);
+        if (file == null || file.isEmpty()) throw new StorageException("File not present");
+        this.createStorageToUploadedFile(serviceType);
         try (InputStream inputStream = file.getInputStream()) {
-            Path uploadedFile = pathManager.getDirAtRootByName(DirsAtRoot.UPLOADED).resolve(Objects.requireNonNull(file.getOriginalFilename()));
+            String filename = Objects.requireNonNull(file.getOriginalFilename());
+            Path uploadedFile = pathManager.getDirAtRootByName(DirsAtRoot.UPLOAD).resolve(filename);
             Files.copy(inputStream, uploadedFile, StandardCopyOption.REPLACE_EXISTING);
             pathManager.setUploadedFile(uploadedFile);
             return uploadedFile;
         } catch (IOException e) {
-            throw new StorageException("Can't store uploaded file");
+            e.printStackTrace();
+            throw new StorageException("Can't store uploaded file = " + file.getOriginalFilename());
         }
     }
 
-    public List<Path> saveUploadedFiles(MultipartFile[] files, ServiceType serviceType) throws StorageException {
-        if (files.length == 0) throw new StorageException("File not present");
-        DirUtils.createStorageToUploadedFiles(serviceType);
-        Path uploadedDir = pathManager.getDirAtRootByName(DirsAtRoot.UPLOADED);
-        List<Path> uploadedFilesPaths = new ArrayList<>();
-        //It necessary to merge files.
-        //Because is simple way not requiring freq access to the file system;
-        Map<Integer, Path> uploadedFiles = new HashMap<>();
-        for (int ordinal = 0; ordinal < files.length; ordinal++) {
-            try (InputStream inputStream = files[ordinal].getInputStream()) {
-                Path uploadedFile = uploadedDir.resolve(Objects.requireNonNull(files[ordinal].getOriginalFilename()));
+    @Override
+    public List<Path> saveUploadedFiles(List<MultipartFile> files, ServiceType serviceType) throws StorageException {
+        if (files == null || files.isEmpty()) throw new StorageException("File not present");
+        this.createStorageToUploadedFile(serviceType);
+        Path uploadedDir = pathManager.getDirAtRootByName(DirsAtRoot.UPLOAD);
+        List<Path> uploadedFiles = new ArrayList<>();
+        for (int ordinal = 0; ordinal < files.size(); ordinal++) {
+            try (InputStream inputStream = files.get(ordinal).getInputStream()) {
+                String filename = files.get(ordinal).getOriginalFilename();
+                Path uploadedFile = uploadedDir.resolve(filename);
                 Files.copy(inputStream, uploadedFile, StandardCopyOption.REPLACE_EXISTING);
-                uploadedFilesPaths.add(uploadedFile);
-                uploadedFiles.put(ordinal, uploadedFile);
+                uploadedFiles.add(uploadedFile);
+                pathManager.putUploadedFileToUploadedFiles(ordinal, uploadedFile);
             } catch (IOException e) {
-                throw new StorageException("Can't store uploaded files");
+                e.printStackTrace();
+                throw new StorageException("Can't store uploaded files = " + files.get(ordinal).getOriginalFilename());
             }
         }
-        pathManager.setUploadedFiles(uploadedFiles);
-        return uploadedFilesPaths;
+        return uploadedFiles;
+    }
+
+    private void createStorageToUploadedFile(ServiceType serviceType) throws StorageException {
+        Path uploadedRootDir = pathManager.getStorage().resolve(genRootDirName(serviceType));
+        try {
+            Files.createDirectory(uploadedRootDir);
+            pathManager.setUploadedRootDir(uploadedRootDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new StorageException("Can't create root directory");
+        }
+        Map<DirsAtRoot, Path> dirStructureByType = this.createDirStructureByType(serviceType);
+        pathManager.setDirsAtRoot(dirStructureByType);
+    }
+
+    private Path createDirAtRoot(String dirName) throws StorageException {
+        try {
+            Path dirPath = pathManager.getUploadedRootDir().resolve(dirName);
+            if (!Files.exists(dirPath)) {
+                Files.createDirectory(dirPath);
+            }
+            return dirPath;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new StorageException("Can't create directory at root");
+        }
+    }
+
+    private Map<DirsAtRoot, Path> createDirStructureByType(ServiceType serviceType) throws StorageException {
+        Map<DirsAtRoot, Path> dirsAtRootMap = new HashMap<>();
+        for (DirsAtRoot dirsAtRoot : serviceType.getDirAtRoot()) {
+            Path dirAtRootPath = createDirAtRoot(dirsAtRoot.name().toLowerCase());
+            dirsAtRootMap.put(dirsAtRoot, dirAtRootPath);
+        }
+        return dirsAtRootMap;
+    }
+
+    private String genRootDirName(ServiceType serviceType) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
+        LocalDateTime now = LocalDateTime.now();
+        return dtf.format(now) + "_" + serviceType.name() + "_" + UUID.randomUUID().toString().substring(0, 8);
     }
 }

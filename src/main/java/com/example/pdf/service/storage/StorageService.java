@@ -6,15 +6,18 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public interface StorageService {
-    void init() throws StorageException;
+    void initStorage() throws StorageException;
 
-    void deleteAll();
+    void deleteStorage();
 
     Resource loadAsResource(String filename) throws StorageException;
 
     Resource loadAsResource(Path path) throws StorageException;
 
     Path saveUploadedFile(MultipartFile file, ServiceType serviceType) throws StorageException;
+
+    List<Path> saveUploadedFiles(List<MultipartFile> files, ServiceType serviceType) throws StorageException;
 }

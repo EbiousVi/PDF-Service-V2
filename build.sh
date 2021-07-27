@@ -1,0 +1,1 @@
+docker build -t ebious/pdf-backend:0.9.1 .

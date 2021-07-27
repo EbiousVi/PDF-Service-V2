@@ -4,18 +4,22 @@
 
 <script>
 
-  export default {
-    name: 'App',
-    components: {},
-  }
+    export default {
+        name: 'App',
+        components: {},
+    }
 </script>
 
 <style>
-  #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    margin-left: 10%;
-    margin-right: 10%;
-  }
+    body {
+        background-color: grey;
+    }
+
+    #app {
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin-left: 10%;
+        margin-right: 10%;
+    }
 </style>

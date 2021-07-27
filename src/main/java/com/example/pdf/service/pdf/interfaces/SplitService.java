@@ -1,15 +1,14 @@
 package com.example.pdf.service.pdf.interfaces;
 
-import com.example.pdf.exception.PdfServicesException;
-import com.example.pdf.exception.StorageException;
+import com.example.pdf.exception.PdfServiceException;
 
 import java.nio.file.Path;
 import java.util.List;
 
 public interface SplitService {
-    List<Path> renderImgToFront(Path uploadedFile) throws PdfServicesException;
+    List<Path> renderFilePages(Path uploadedFile) throws PdfServiceException;
 
-    Path splitBySelectedPages(Integer[] pages) throws StorageException;
+    Path splitBySelectedPages(Integer[] pages) throws PdfServiceException;
 
-    List<Path> splitAll() throws PdfServicesException;
+    List<Path> splitBySinglePages() throws PdfServiceException;
 }

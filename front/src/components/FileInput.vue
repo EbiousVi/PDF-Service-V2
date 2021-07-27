@@ -50,7 +50,7 @@
                 if (this.multiple) {
                     this.$refs.uploadFile.value = '';
                     this.uploadFiles = [];
-                    this.uploadFilesName = ["SELECT PDF FILE"];
+                    this.uploadFilesName = ["SELECT PDF FILES"];
                     this.$emit("reset");
                 } else {
                     this.$refs.uploadFile.value = '';
@@ -58,7 +58,7 @@
                     this.uploadFileName = 'SELECT PDF FILE';
                     this.$emit("reset");
                 }
-            },
+            }
         }
     }
 </script>

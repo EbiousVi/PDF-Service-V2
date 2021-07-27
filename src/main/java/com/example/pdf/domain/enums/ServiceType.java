@@ -2,10 +2,12 @@ package com.example.pdf.domain.enums;
 
 public enum ServiceType {
     SPLIT(new DirsAtRoot[]{
-            DirsAtRoot.SPLITTED, DirsAtRoot.RENDER_IMG, DirsAtRoot.SPLIT_ALL,
-            DirsAtRoot.UPLOADED, DirsAtRoot.ZIP
+            DirsAtRoot.SPLIT, DirsAtRoot.RENDER_IMG, DirsAtRoot.SPLIT_ALL,
+            DirsAtRoot.UPLOAD, DirsAtRoot.ZIP
     }),
-    MERGE(new DirsAtRoot[]{DirsAtRoot.UPLOADED, DirsAtRoot.RENDER_IMG, DirsAtRoot.MERGED});
+    MERGE(new DirsAtRoot[]{DirsAtRoot.UPLOAD, DirsAtRoot.RENDER_IMG, DirsAtRoot.MERGE}),
+
+    TEST_CASE(DirsAtRoot.values());
 
     private final DirsAtRoot[] dirsAtRoot;
 

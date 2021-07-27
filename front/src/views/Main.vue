@@ -1,11 +1,11 @@
 <template>
     <div>
         <div class="header">
-            <span>PDF SERVICE</span><br/>
+            <span class="service-name">PDF SERVICE</span><br/>
         </div>
         <div class="services">
-            <div class="service" @click="$router.push('/split')"><span>Split</span></div>
-            <div class="service" @click="$router.push('/merge')"><span>Merge</span></div>
+            <div class="service" @click="$router.push('/split')"><span class="service-name">Split</span></div>
+            <div class="service" @click="$router.push('/merge')"><span class="service-name">Merge</span></div>
         </div>
     </div>
 </template>
@@ -18,17 +18,12 @@
 </script>
 
 <style scoped>
-    span {
-        font-size: 24pt;
-        font-weight: bold;
-    }
-
     .header {
         width: 100%;
-        background-color: antiquewhite;
+        background-color: lavender;
         text-align: center;
         margin-bottom: 10px;
-        border: .03em solid black;
+
         border-radius: .2em;
     }
 
@@ -37,22 +32,28 @@
         flex-wrap: wrap;
         justify-content: center;
         align-items: center;
-        width: 100%;
         height: 10em;
-        border: .03em solid black;
-        border-radius: .2em;
+        border-radius: .3em;
     }
 
     .service {
         height: 100%;
-        width: 50%;
-        background-color: antiquewhite;
-        outline: .03em solid black;
+        width: 48%;
+        margin-right: .3em;
+        padding-top: 5em;
+        background-color: lavender;
         cursor: pointer;
         text-align: center;
+        border-radius: .3em;
     }
 
     .service:hover {
-        background-color: wheat;
+        background-color: #d2c3ec;
+    }
+
+    .service-name {
+        font-size: 24pt;
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        font-weight: bold;
     }
 </style>

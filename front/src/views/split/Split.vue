@@ -2,14 +2,15 @@
     <div class="split-container">
         <button class="btn" style="margin-bottom: 10px" @click="$router.push('/')">Main</button>
         <file-input @file="handleUploadFile" @reset="reset"></file-input>
+        <waiting v-if="waiting"></waiting>
         <div class="split-menu" v-if="isImgLoaded">
             <button class="btn" type="button" @click="simpleSplit">SPLIT</button>
             <button class="btn" type="button" @click="openFilenameMenu">SPLIT PRO
-                <prompt prompt="Выбор имени для файла с разделенными страницами. Возможно добавить пространство имен для хранения определенных имен файлов. При добавление, всех сохраняется в базу данных.">
+                <prompt prompt="Выбор имени для файла полученного в результате работы сервиса. Возможно добавить пространство имен для хранения имен файлов. При добавление, все сохраняется в базу данных.">
                     &#128269;
                 </prompt>
             </button>
-            <button class="btn" type="button" @click="splitAllByPage">SPLIT ALL
+            <button class="btn" type="button" @click="splitBySinglePages">SPLIT ALL
                 <prompt prompt="Разделяет файл постранично, упаковывая в архив.">&#128269;</prompt>
             </button>
         </div>
@@ -18,6 +19,7 @@
             <filename-menu v-show="isSplitMenuVisible" @close="closeFilenameMenu"
                            @filename="splitWithName"></filename-menu>
         </div>
+        <modal v-if="alert" :message="alertInfo" @close="closeAlert"></modal>
         <pages v-if="isImgLoaded" :images="images" :isSuccessSplit="isSuccessSplit"
                @reset="isSuccessSplit = false" @selectedPages="getSelectedPages"></pages>
     </div>
@@ -30,12 +32,14 @@
     import FilenameMenu from "./FilenameMenu";
     import Modal from "../../components/Modal";
     import Prompt from "../../components/Prompt";
+    import Waiting from "../../components/Waiting";
 
     export default {
         fileName: "UploadFile",
-        components: {Prompt, Modal, FilenameMenu, FileInput, Pages},
+        components: {Waiting, Prompt, Modal, FilenameMenu, FileInput, Pages},
         data() {
             return {
+                waiting: false,
                 alert: false,
                 alertInfo: "",
                 isSuccessSplit: false,
@@ -47,8 +51,8 @@
             }
         },
         methods: {
-            splitAllByPage() {
-                axios.get('http://192.168.3.2:6060/split-service/split-all', {
+            splitBySinglePages() {
+                axios.get('http://192.168.3.2:6060/split-service/split-by-single-pages', {
                     responseType: 'arraybuffer',
                     headers: {
                         "Access-Control-Expose-Headers": "Content-Disposition"
@@ -64,6 +68,14 @@
                         link.click();
                         link.remove();
                         URL.revokeObjectURL(blobUrl);
+                    }
+                }).catch(error => {
+                    if (!error.response) {
+                        this.alert = true;
+                        this.alertInfo = error.message;
+                    } else {
+                        this.alert = true;
+                        this.alertInfo = error.response.data;
                     }
                 });
             },
@@ -100,6 +112,14 @@
                         this.isSuccessSplit = true;
                         this.selectedPages = [];
                     }
+                }).catch(error => {
+                    if (!error.response) {
+                        this.alert = true;
+                        this.alertInfo = error.message;
+                    } else {
+                        this.alert = true;
+                        this.alertInfo = error.response.data;
+                    }
                 });
             },
             openFilenameMenu() {
@@ -120,7 +140,7 @@
             uploadFile(file) {
                 let formData = new FormData();
                 formData.append('file', file);
-                axios.post('http://192.168.3.2:6060/split-service/upload', formData,
+                let promise = axios.post('http://192.168.3.2:6060/split-service/upload', formData,
                     {
                         headers: {
                             'Content-Type': 'multipart/addForm-data'
@@ -139,8 +159,19 @@
                         }
                         this.images = arr;
                         this.isImgLoaded = true;
+                        this.waiting = false;
                     }
+                }).catch(error => {
+                    if (!error.response) {
+                        this.alert = true;
+                        this.alertInfo = error.message;
+                    } else {
+                        this.alert = true;
+                        this.alertInfo = error.response.data;
+                    }
+                    this.waiting = false;
                 });
+                promise.then(this.waiting = true);
             },
             getSelectedPages(selectedPages) {
                 this.selectedPages = selectedPages;
@@ -166,6 +197,7 @@
         flex-direction: column;
         align-items: center;
         background-color: lavender;
+        border-radius: .1em;
     }
 
     .split-menu {

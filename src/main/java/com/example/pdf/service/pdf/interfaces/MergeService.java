@@ -1,12 +1,12 @@
 package com.example.pdf.service.pdf.interfaces;
 
-import com.example.pdf.exception.PdfServicesException;
+import com.example.pdf.exception.PdfServiceException;
 
 import java.nio.file.Path;
 import java.util.List;
 
 public interface MergeService {
-    List<Path> renderImgToFront(List<Path> uploadedFiles) throws PdfServicesException;
+    List<Path> renderFileCover(List<Path> uploadedFiles) throws PdfServiceException;
 
-    Path merge(Integer[] order) throws PdfServicesException;
+    Path merge(Integer[] order) throws PdfServiceException;
 }

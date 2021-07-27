@@ -1,10 +1,17 @@
 package com.example.pdf.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.validation.annotation.Validated;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
 @Table(name = "namespace")
+@Validated
 public class Namespace {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -12,17 +19,26 @@ public class Namespace {
     private Integer id;
 
     @Column(name = "namespace_name", unique = true, nullable = false)
-    private String namespace;
+    @Length(min = 3, max = 255)
+    @NotBlank
+    private String name;
 
-    @OneToMany(mappedBy = "namespace", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "namespace", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Filename> filenames;
+
+    public Namespace(@Size(min = 3, max = 255) String name) {
+        this.name = name;
+    }
+
+    public Namespace() {
+    }
 
     @Override
     public String toString() {
         return "Namespace{" +
                 "id=" + id +
-                ", namespace='" + namespace + '\'' +
-                ", filenames=" + filenames +
+                ", name='" + name + '\'' +
                 '}';
     }
 
@@ -34,12 +50,12 @@ public class Namespace {
         this.id = id;
     }
 
-    public String getNamespace() {
-        return namespace;
+    public String getName() {
+        return name;
     }
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
+    public void setName(String namespace) {
+        this.name = namespace;
     }
 
     public List<Filename> getFilenames() {

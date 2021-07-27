@@ -25,7 +25,7 @@
                 <span style="word-break: break-all;">Add</span>
             </button>
         </div>
-        <div v-if="filename">
+        <div v-if="filename" style="display: flex; flex-direction: column; align-items: center">
             <div class="add-form-elem">
                 <m-select :options="namespaces" :is-delete-enable="false" @selected="getSelectedNamespace"></m-select>
             </div>
@@ -85,7 +85,7 @@
                     this.badRespInfo = "Пространство имен не выбрано";
                     return;
                 }
-                axios.post('http://192.168.3.2:6060/add-filename', this.form)
+                axios.post('http://192.168.3.2:6060/naming/add-filename', this.form)
                     .then(response => {
                         if (response.status === 200) {
                             this.isRespBad = false;
@@ -94,8 +94,13 @@
                             this.form.filename = "";
                         }
                     }).catch(error => {
-                    this.isRespBad = true;
-                    this.badRespInfo = error.response.data.error + " " + error.response.status;
+                    if (!error.response) {
+                        this.isRespBad = true;
+                        this.badRespInfo = error.message;
+                    } else {
+                        this.isRespBad = true;
+                        this.badRespInfo = error.response.data;
+                    }
                 });
             },
             addNamespace() {
@@ -104,7 +109,7 @@
                     this.badRespInfo = "Длина имени должна быть не меньше 3 символов";
                     return;
                 }
-                axios.get('http://192.168.3.2:6060/add-namespace', {params: {namespace: this.form.namespace}})
+                axios.get('http://192.168.3.2:6060/naming/add-namespace', {params: {namespace: this.form.namespace}})
                     .then(response => {
                         if (response.status === 200) {
                             this.isRespBad = false;
@@ -113,8 +118,13 @@
                             this.form.namespace = "";
                         }
                     }).catch(error => {
-                    this.isRespBad = true;
-                    this.badRespInfo = error.response.data.error + " " + error.message;
+                    if (!error.response) {
+                        this.isRespBad = true;
+                        this.badRespInfo = error.message;
+                    } else {
+                        this.isRespBad = true;
+                        this.badRespInfo = error.response.data;
+                    }
                 });
             },
         }

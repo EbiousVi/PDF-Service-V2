@@ -15,15 +15,15 @@
                         <div><span>Filename</span></div>
                         <div style="margin-bottom: 1em">
                             <m-select :options="filenames" :is-filename="true"
+                                      :selected-namespace="selectedNamespace"
                                       @selected="getSelectedFilename"
                                       @deleted="deleteFilenameFromNamespace"></m-select>
                         </div>
                     </div>
-                    <div><span style="color: red" v-if="warn">{{warnInfo}}</span></div>
                     <div>
-                        <button type="button" class="btn menu-btn" @click="getFilenames">Get names
-                            <prompt prompt="Загружает данные из БД">&#128269;</prompt>
-                        </button>
+                        <!--     <button type="button" class="btn menu-btn" @click="getFilenames">Get names
+                                 <prompt prompt="Загружает данные из БД">&#128269;</prompt>
+                             </button>-->
                         <button type="button" class="btn menu-btn" @click="showAddFrom">Add Form
                             <prompt prompt="Добавление новых пространств имен и имен файлов">&#128269;</prompt>
                         </button>
@@ -38,7 +38,7 @@
                         </button>
                     </div>
                 </div>
-
+                <modal v-if="warn" :message="warnInfo" @close="closeWarn"></modal>
                 <div v-if="isAddFormEnable" class="filename-menu">
                     <add-form @namespace="addNamespace" :namespace="true">Add Namespace</add-form>
                     <add-form @filename="addFilename" :filename="true" :namespaces="namespaces">Add filename to
@@ -61,11 +61,12 @@
     import MSelect from "./MSelect";
     import AddForm from "./AddForm";
     import Prompt from "../../components/Prompt";
+    import Modal from "../../components/Modal";
 
     export default {
         name: "FilenameMenu",
         emits: ["filename", "close"],
-        components: {Prompt, AddForm, MSelect},
+        components: {Modal, Prompt, AddForm, MSelect},
         data() {
             return {
                 isAddFormEnable: false,
@@ -78,10 +79,13 @@
                 warnInfo: "",
             }
         },
-        mounted() {
-            console.log("mounted filename-menu")
+        async mounted() {
+            await this.getFilenames();
         },
         methods: {
+            closeWarn() {
+                this.warn = false;
+            },
             closeAddForm() {
                 this.isAddFormEnable = false
             },
@@ -116,7 +120,6 @@
                 this.map.set(namespace, []);
             },
             addFilename(form) {
-                console.log(form.namespace)
                 this.map.get(form.namespace).push(this.fillOption(form.filename));
             },
             deleteNamespace(namespace) {
@@ -132,7 +135,7 @@
                 this.map.get(this.selectedNamespace).splice(index, 1);
             },
             getFilenames() {
-                axios.get('http://192.168.3.2:6060/get-filenames')
+                axios.get('http://192.168.3.2:6060/naming/namespace-and-filenames')
                     .then(response => {
                         if (response.status === 200) {
                             if (Object.entries(response.data).length === 0) {
@@ -145,7 +148,15 @@
                             }
                             this.namespaces = this.fillOptions(Object.keys(response.data));
                         }
-                    });
+                    }).catch(error => {
+                    if (!error.response) {
+                        this.warn = true;
+                        this.warnInfo = error.message;
+                    } else {
+                        this.warn = true;
+                        this.warnInfo = error.response.data;
+                    }
+                });
             },
             fillOptions(arr) {
                 const selectOptions = [];
