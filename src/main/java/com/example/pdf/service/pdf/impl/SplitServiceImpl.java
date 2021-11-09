@@ -117,7 +117,7 @@ public class SplitServiceImpl implements SplitService, ZipService {
             PDFRenderer render = new PDFRenderer(document);
             Path renderingPagesDir = pathManager.getDirAtRootByName(DirsAtRoot.RENDER_IMG);
             for (int i = 0; i < document.getNumberOfPages(); i++) {
-                BufferedImage image = render.renderImageWithDPI(i, 36);
+                BufferedImage image = render.renderImageWithDPI(i, 72);
                 String filename = Filename.IMG_PAGE.name + i + "_" +
                         uploadedFile.getFileName().toString().replaceFirst("\\.[^.]+$", "") + "_" +
                         UUID.randomUUID().toString().substring(0, 8) + Extension.JPEG.name;

@@ -21,7 +21,7 @@ public class NamespaceService {
 
     public Namespace getNamespaceByName(String name) throws CustomDBException {
         return namespaceRepository.findByName(name)
-                .orElseThrow(() -> new CustomDBException("Namespace = " + name + " not found!"));
+                .orElseThrow(() -> new CustomDBException("Namespace <" + name + "> not found!"));
     }
 
     public List<Namespace> getAllNamespace() {
@@ -41,7 +41,7 @@ public class NamespaceService {
         if (!namespaceRepository.existsByName(name)) {
             namespaceRepository.save(namespace);
         } else {
-            throw new CustomDBException("Namespace = " + name + " already exist!");
+            throw new CustomDBException("Namespace <" + name + "> already exist!");
         }
     }
 

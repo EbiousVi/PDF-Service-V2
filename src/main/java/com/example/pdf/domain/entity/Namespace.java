@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,8 +25,8 @@ public class Namespace {
     private String name;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "namespace", orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Filename> filenames;
+    @OneToMany(mappedBy = "namespace", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Filename> filenames = new ArrayList<>();
 
     public Namespace(@Size(min = 3, max = 255) String name) {
         this.name = name;

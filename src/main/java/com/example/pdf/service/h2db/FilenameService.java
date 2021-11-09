@@ -6,6 +6,8 @@ import com.example.pdf.repository.FilenameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 public class FilenameService {
     private final FilenameRepository filenameRepository;
@@ -21,7 +23,7 @@ public class FilenameService {
 
     public void deleteFilename(String filename, String namespace) throws CustomDBException {
         Filename _filename = filenameRepository.findByNameAndNamespaceName(filename, namespace)
-                .orElseThrow(() -> new CustomDBException("Filename = " + filename + " not found at Namespace = " + namespace));
-        filenameRepository.delete(_filename);
+                .orElseThrow(() -> new CustomDBException("Filename <" + filename + "> not found at Namespace <" + namespace + ">"));
+        filenameRepository.deleteById(_filename.getId());
     }
 }

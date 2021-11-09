@@ -18,6 +18,14 @@ public class AddFormDto {
     public AddFormDto() {
     }
 
+    @Override
+    public String toString() {
+        return "AddFormDto{" +
+                "namespace='" + namespace + '\'' +
+                ", filename='" + filename + '\'' +
+                '}';
+    }
+
     public AddFormDto(@NotBlank(message = "{namespace.blank}")
                       @Size(min = 3, max = 255, message = "{namespace.size}")
                               String namespace,

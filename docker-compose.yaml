@@ -1,17 +1,15 @@
 version: "3.5"
 services:
   backend:
-    image: ebious/pdf-backend:0.9.1
+    image: ebious/pdf-backend:latest
     environment:
       - "JAVA_TOOL_OPTIONS=-Xms256m -Xmx256m"
     ports:
-      - 6060:6060
+      - "6060:6060"
     volumes:
       - ...ENTER PATH...:/opt/pdf-back/src/main/resources
   frontend:
-    image: ebious/pdf-frontend:0.9.1
+    image: ebious/pdf-frontend:latest
     ports:
-      - 8080:8080
-    links:
-      - backend
+      - "8080:8080"
 

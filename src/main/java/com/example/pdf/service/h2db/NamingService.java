@@ -25,20 +25,17 @@ public class NamingService {
 
     public void addFilenameToNamespace(AddFormDto addFormDto) throws CustomDBException {
         Namespace namespace = namespaceService.getNamespaceByName(addFormDto.getNamespace());
+        System.out.println(namespace);
+        System.out.println(namespace.getFilenames());
         Optional<Filename> filename = namespace.getFilenames()
                 .stream()
                 .filter(f -> f.getName().equals(addFormDto.getFilename()))
                 .findAny();
         if (filename.isPresent()) {
-            throw new CustomDBException("Filename at namespace = " + namespace.getName() + " already exist");
+            throw new CustomDBException("Filename <" + addFormDto.getFilename() + "> at namespace <" + addFormDto.getNamespace() + "> already exist");
         } else {
             filenameService.addFilename(new Filename(addFormDto.getFilename(), namespace));
         }
-    }
-
-    public void addFilenameToNamespace(String _namespace, String _filename) throws CustomDBException {
-        Namespace namespace = namespaceService.getNamespaceByName(_namespace);
-        filenameService.addFilename(new Filename(_filename, namespace));
     }
 
     public Map<String, List<String>> collectAllNamespacesAndTheirFilenames() {
@@ -46,8 +43,20 @@ public class NamingService {
                 .stream()
                 .collect(Collectors.toMap(Namespace::getName,
                         n -> n.getFilenames()
-                        .stream()
-                        .map(Filename::getName)
-                        .collect(Collectors.toList())));
+                                .stream()
+                                .map(Filename::getName)
+                                .collect(Collectors.toList())));
+    }
+
+    public void personal(Map<String, String[]> map) throws CustomDBException {
+        for (Map.Entry<String, String[]> pair : map.entrySet()) {
+            String namespace = pair.getKey();
+            namespaceService.addNamespace(namespace);
+            String[] filenames = pair.getValue();
+            for (String filename : filenames) {
+                AddFormDto addFormDto = new AddFormDto(namespace, filename);
+                this.addFilenameToNamespace(addFormDto);
+            }
+        }
     }
 }

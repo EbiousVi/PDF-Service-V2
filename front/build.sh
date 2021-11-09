@@ -1,1 +1,0 @@
-docker build -t ebious/pdf-frontend:0.9.1 .

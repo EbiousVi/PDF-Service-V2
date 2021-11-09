@@ -38,7 +38,7 @@ public class MergeServiceImpl implements MergeService {
         for (Path uploadedFile : uploadedFiles) {
             try (PDDocument document = PDDocument.load(uploadedFile.toFile())) {
                 render = new PDFRenderer(document);
-                BufferedImage image = render.renderImageWithDPI(0, 36);
+                BufferedImage image = render.renderImageWithDPI(0, 72);
                 String filename = Filename.IMG_COVER.name +
                         uploadedFile.getFileName().toString().replaceFirst("\\.[^.]+$", "") + "_" +
                         UUID.randomUUID().toString().substring(0, 8) + Extension.JPEG.name;
