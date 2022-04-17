@@ -1,0 +1,26 @@
+[
+  {
+    "namespace": "Namespace_1",
+    "filenames": [
+      "filename_1_to_namespace_1",
+      "filename_2_to_namespace_1",
+      "filename_3_to_namespace_1"
+    ]
+  },
+  {
+    "namespace": "Namespace_2",
+    "filenames": [
+      "filename_1_to_namespace_2",
+      "filename_2_to_namespace_2",
+      "filename_3_to_namespace_2"
+    ]
+  },
+  {
+    "namespace": "Namespace_3",
+    "filenames": [
+      "filename_1_to_namespace_3",
+      "filename_2_to_namespace_3",
+      "filename_3_to_namespace_3"
+    ]
+  }
+]

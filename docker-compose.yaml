@@ -1,15 +1,15 @@
 version: "3.5"
 services:
-  backend:
-    image: ebious/pdf-backend:latest
-    environment:
-      - "JAVA_TOOL_OPTIONS=-Xms256m -Xmx256m"
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
     ports:
       - "6060:6060"
-    volumes:
-      - ...ENTER PATH...:/opt/pdf-back/src/main/resources
   frontend:
-    image: ebious/pdf-frontend:latest
+    build:
+      context: ./front
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
 

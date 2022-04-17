@@ -1,8 +1,12 @@
 HELP.md
 target/
+
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+service-storage/
+src/test/service-storage/
+
 
 ### STS ###
 .apt_generated
