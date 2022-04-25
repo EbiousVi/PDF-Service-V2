@@ -10,7 +10,7 @@
     ></file-input>
     <waiting v-if="waiting"></waiting>
     <button v-if="isImgLoaded" class="btn" type="button" @click="merge">
-      {{ $filters.localize("merge") }}
+      {{ $filters.localize("merge.merge-btn") }}
     </button>
     <modal v-if="alert" :message="alertInfo" @close="closeAlert"></modal>
     <cards v-if="isImgLoaded" :images="images" @order="getOrder"></cards>
@@ -24,6 +24,7 @@ import Cards from "../../components/Cards";
 import Waiting from "../../components/Waiting";
 import Modal from "../../components/Modal";
 import { bearer } from "../../utils/bearer";
+import { getUrl } from "../../utils/url";
 
 export default {
   name: "Merge",
@@ -36,6 +37,9 @@ export default {
       images: [],
       isImgLoaded: false,
       order: [],
+      mergeURL : "/merge-service/merge",
+      uploaderPdfFilesURL : "/uploader/pdf-files",
+
     };
   },
   methods: {
@@ -47,7 +51,7 @@ export default {
     },
     merge() {
       axios
-        .post("http://localhost:6060/merge-service/merge", this.order, {
+        .post(getUrl(this.mergeURL), this.order, {
           responseType: "arraybuffer",
           headers: {
             "Access-Control-Expose-Headers": "Content-Disposition",
@@ -85,7 +89,7 @@ export default {
         formData.append("file", files[i]);
       }
       let promise = axios
-        .post("http://localhost:6060/uploader/pdf-files", formData, {
+        .post(getUrl(this.uploaderPdfFilesURL), formData, {
           headers: {
             "Content-Type": "multipart/addForm-data"
           },

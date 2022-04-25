@@ -70,6 +70,7 @@ import axios from "axios";
 import MSelect from "./MSelect";
 import Prompt from "../../components/Prompt";
 import { bearer } from "../../utils/bearer";
+import { getUrl } from "../../utils/url";
 
 export default {
   name: "AddForm",
@@ -96,6 +97,8 @@ export default {
       isRespOk: false,
       isRespBad: false,
       showAddForm: false,
+      addFilenameURL: "/naming/add-filename",
+      addNamespaceURL: "/naming/add-namespace",
     };
   },
   methods: {
@@ -118,7 +121,7 @@ export default {
         return;
       }
       axios
-        .post("http://localhost:6060/naming/add-filename", this.form, {
+        .post(getUrl(this.addFilenameURL), this.form, {
           headers: {
             "Access-Control-Expose-Headers": "Content-Disposition",
             Authorization: bearer(),
@@ -151,7 +154,7 @@ export default {
         return;
       }
       axios
-        .get("http://localhost:6060/naming/add-namespace", {
+        .get(getUrl(this.addNamespaceURL), {
           params: { namespace: this.form.namespace },
           headers: {
             "Access-Control-Expose-Headers": "Content-Disposition",

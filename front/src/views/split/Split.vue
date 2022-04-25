@@ -7,16 +7,16 @@
     <waiting v-if="waiting"></waiting>
     <div class="split-menu" v-if="isImgLoaded">
       <button class="btn split-btn" type="button" @click="simpleSplit">
-        {{ $filters.localize("split") }}
+        {{ $filters.localize("split.split-btn") }}
       </button>
       <button class="btn split-btn" type="button" @click="openFilenameMenu">
-        {{ $filters.localize("split-pro") }}
+        {{ $filters.localize("split.split-naming-btn") }}
         <prompt :prompt="$filters.localize('prompt-split-pro')">
           &#128269;
         </prompt>
       </button>
       <button class="btn split-btn" type="button" @click="splitBySinglePages">
-        {{ $filters.localize("split-all") }}
+        {{ $filters.localize("split.split-by-pages-btn") }}
         <prompt :prompt="$filters.localize('prompt-split-all')"
           >&#128269;</prompt
         >
@@ -43,6 +43,7 @@
 
 <script>
 import { bearer } from "../../utils/bearer";
+import { getUrl } from "../../utils/url";
 import axios from "axios";
 import Pages from "../../components/Pages";
 import FileInput from "../../components/FileInput";
@@ -65,19 +66,22 @@ export default {
     return {
       waiting: false,
       alert: false,
-      alertInfo: "",
+      alertInfo: '',
       isSuccessSplit: false,
       isSplitMenuVisible: false,
       isSplitMenuEnable: false,
       images: [],
       isImgLoaded: false,
       selectedPages: [],
+      uploadPdfFileURL : '/uploader/pdf-file',
+      splitBySinglePagesURL : '/split-service/split-by-single-pages',
+      splitBySelectedPagesURL : '/split-service/split-by-selected-pages',
     };
   },
   methods: {
     splitBySinglePages() {
       axios
-        .get("http://localhost:6060/split-service/split-by-single-pages", {
+        .get(getUrl(this.splitBySinglePagesURL), {
           responseType: "arraybuffer",
           headers: {
             "Access-Control-Expose-Headers": "Content-Disposition",
@@ -125,7 +129,7 @@ export default {
     postSelectedPages(filename) {
       axios
         .post(
-          "http://localhost:6060/split-service/split-by-selected-pages",
+          getUrl(this.splitBySelectedPagesURL),
           this.selectedPages,
           {
             responseType: "arraybuffer",
@@ -180,7 +184,7 @@ export default {
       let formData = new FormData();
       formData.append("file", file);
       let promise = axios
-        .post("http://localhost:6060/uploader/pdf-file", formData, {
+        .post(getUrl(this.uploadPdfFileURL), formData, {
           headers: {
             "Content-Type": "multipart/addForm-data",
           },

@@ -13,11 +13,7 @@ const router = createRouter({
     root: '/',
     routes: [
         { path: '/', component: Main, alias: '' },
-        {
-            path: '/split', component: Split, meta: {
-                requiresAuth: true
-            }
-        },
+        { path: '/split', component: Split },
         { path: '/merge', component: Merge }
     ]
 })

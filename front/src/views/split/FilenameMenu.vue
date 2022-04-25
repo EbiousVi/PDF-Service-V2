@@ -34,7 +34,7 @@
           <div>
             <button class="btn menu-btn">
               <label for="import">
-                <span>Импорт базы</span>
+                <span>{{ $filters.localize("import-data") }}</span>
                 <input
                   type="file"
                   id="import"
@@ -45,7 +45,7 @@
               </label>
             </button>
             <button class="btn menu-btn" @click="exportToJson()">
-              <span>Экспорт базы</span>
+              <span>{{ $filters.localize("export-data") }}</span>
             </button>
           </div>
           <div>
@@ -61,7 +61,7 @@
                 >&#128269;</prompt
               >
             </button>
-            <button type="button" class="btn menu-btn disable">Очистить базу</button>
+            <button type="button" class="btn menu-btn disable">{{ $filters.localize("delete-database") }}</button>
           </div>
           <div style="padding-top: 15px">
             <button
@@ -105,6 +105,7 @@ import AddForm from "./AddForm";
 import Prompt from "../../components/Prompt";
 import Modal from "../../components/Modal";
 import { bearer } from "../../utils/bearer";
+import { getUrl } from "../../utils/url";
 
 export default {
   name: "FilenameMenu",
@@ -120,6 +121,9 @@ export default {
       map: new Map(),
       warn: false,
       warnInfo: "",
+      getAllURL : "/naming/namespace-and-filenames",
+      importURL : "/naming/import-from-json",
+      exprotURL : "/naming/export-to-json"
     };
   },
   mounted() {
@@ -179,7 +183,7 @@ export default {
     },
     getFilenames() {
       axios
-        .get("http://localhost:6060/naming/namespace-and-filenames", {
+        .get(getUrl(this.getAllURL), {
           headers: {
             "Access-Control-Expose-Headers": "Content-Disposition",
             Authorization: bearer(),
@@ -226,7 +230,7 @@ export default {
       let formData = new FormData();
       formData.append("file", this.$refs.file.files[0]);
       axios
-        .post("http://localhost:6060/naming/import-from-json", formData, {
+        .post(getUrl(this.importURL), formData, {
           headers: {
             "Content-Type": "multipart/addForm-data",
             Authorization: bearer(),
@@ -234,7 +238,7 @@ export default {
         })
         .then((response) => {
           if (response.status === 200) {
-            alert("Import success");
+            alert("Успешно!");
           }
         })
         .catch((error) => {
@@ -243,7 +247,7 @@ export default {
     },
     exportToJson() {
       axios
-        .get("http://localhost:6060/naming/export-to-json", {
+        .get(getUrl(this.exprotURL), {
           responseType: "arraybuffer",
           headers: {
             "Access-Control-Expose-Headers": "Content-Disposition",

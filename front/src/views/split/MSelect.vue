@@ -64,6 +64,7 @@
 import axios from "axios";
 import Modal from "../../components/Modal";
 import { bearer } from "../../utils/bearer";
+import { getUrl } from "../../utils/url";
 
 export default {
   name: "m-select",
@@ -115,6 +116,8 @@ export default {
       selectedOption: this.$filters.localize("m-sel-select"),
       warn: false,
       warnInfo: "",
+      deleteNamespaceURL: "/naming/delete-namespace/",
+      deleteFilenameURL: "/naming/delete-filename/",
     };
   },
   methods: {
@@ -133,16 +136,16 @@ export default {
     },
     deleteOption(option) {
       if (this.isNamespace) {
-        let URL = "http://localhost:6060/naming/delete-namespace/".concat(
+        let URL = this.deleteNamespaceURL.concat(
           option.value
         );
-        this.delete(URL, option);
+        this.delete(getUrl(URL), option);
       } else {
-        let URL = "http://localhost:6060/naming/delete-filename/"
+        let URL = this.deleteFilenameURL
           .concat(this.selectedNamespace)
           .concat("/")
           .concat(option.value);
-        this.delete(URL, option);
+        this.delete(getUrl(URL), option);
       }
     },
     delete(URL, option) {

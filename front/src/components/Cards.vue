@@ -4,7 +4,7 @@
       <prompt :prompt="$filters.localize('prompt-card-order')"
         >&#128269;</prompt
       >
-      {{ $filters.localize("order") }}
+      {{ $filters.localize("cardes.merge-order") }}
     </div>
 
     <div class="cards-board">
@@ -158,7 +158,6 @@ export default {
       this.order.splice(orderArrIndex, 1);
       const cardArrIndex = this.cards.indexOf(card);
       this.cards.splice(cardArrIndex, 1);
-      this.$emit("selectedPages", this.order);
       if (this.cards.length === 0) {
         this.cards = this.initialCards;
         this.initialCards = this.initialCards.slice();

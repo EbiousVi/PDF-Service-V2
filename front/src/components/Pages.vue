@@ -29,14 +29,11 @@
         </button>
       </div>
       <div class="page-selected">
-        {{ $filters.localize("selected-pages") }}:
+        {{ $filters.localize("pages.selected-pages") }}:
         {{ selectedPages.join(", ") }}
       </div>
     </div>
     <div class="pages-board">
-      <button v-if="isRtnBtnEnable" @click="returnPages" class="btn">
-        {{ $filters.localize("btn-return") }}
-      </button>
       <div
         v-for="page in pages"
         :key="page"
@@ -116,7 +113,6 @@ export default {
       deletePrompt: this.$filters.localize("prompt-delete"),
       isDeleteEnable: true,
       isOrderLocked: false,
-      isRtnBtnEnable: false,
       allSelected: false,
       pages: this.images,
       initialPages: [],
@@ -231,13 +227,12 @@ export default {
       this.pages.splice(pageIndex, 1);
       this.$emit("selectedPages", this.selectedPages);
       if (this.pages.length === 0) {
-        this.isRtnBtnEnable = true;
+        this.returnPages();
       }
     },
     returnPages() {
       this.pages = this.initialPages;
       this.initialPages = this.initialPages.slice();
-      this.isRtnBtnEnable = false;
     },
     selectAll() {
       if (this.selectedPages.length === this.pages.length) {

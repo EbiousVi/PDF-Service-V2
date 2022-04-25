@@ -2,10 +2,10 @@
   <div>
     <div class="services">
       <div class="service" @click="$router.push('/split')">
-        <span class="service-name">{{ $filters.localize("split") }}</span>
+        <span class="service-name">{{ $filters.localize("split.split-btn") }}</span>
       </div>
       <div class="service" @click="$router.push('/merge')">
-        <span class="service-name">{{ $filters.localize("merge") }}</span>
+        <span class="service-name">{{ $filters.localize("merge.merge-btn") }}</span>
       </div>
     </div>
   </div>

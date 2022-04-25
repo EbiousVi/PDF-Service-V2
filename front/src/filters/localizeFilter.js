@@ -1,10 +1,8 @@
 
 import ru from '../locales/ru.json'
-import en from '../locales/en.json'
 
 const locales = {
-  'ru-RU': ru,
-  'en-US': en
+  'ru-RU': ru
 }
 
 export default function localizeFilter(key) {
